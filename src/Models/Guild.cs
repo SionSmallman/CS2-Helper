@@ -7,7 +7,7 @@ namespace Cs2Bot.Models;
 
 public partial class Guild
 {
-    public long GuildId { get; set; }
+    public ulong GuildId { get; set; }
 
     public bool IsActive { get; set; }
 

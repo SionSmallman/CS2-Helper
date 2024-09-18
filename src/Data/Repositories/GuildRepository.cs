@@ -1,11 +1,6 @@
 ﻿using Cs2Bot.Data.Repositories.Interfaces;
 using Cs2Bot.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cs2Bot.Data.Repositories
 {
@@ -30,7 +25,7 @@ namespace Cs2Bot.Data.Repositories
             return await _context.Guilds.ToListAsync();
         }
 
-        public async Task<Guild?> GetByIdAsync(long guildId)
+        public async Task<Guild?> GetByIdAsync(ulong guildId)
         {
             var guild = await _context.Guilds.SingleOrDefaultAsync(x => x.GuildId == guildId);
             if (guild == null)
@@ -40,7 +35,7 @@ namespace Cs2Bot.Data.Repositories
             return guild;
         }
 
-        public async Task<Guild?> DeleteAsync(long guildId)
+        public async Task<Guild?> DeleteAsync(ulong guildId)
         {
             var guild = await _context.Guilds.SingleOrDefaultAsync(x => x.GuildId == guildId);
             if (guild == null)
@@ -48,6 +43,32 @@ namespace Cs2Bot.Data.Repositories
                 return null;
             }
             _context.Guilds.Remove(guild);
+            await _context.SaveChangesAsync();
+            return guild;
+        }
+
+
+        //Refactor this
+        public async Task<Guild?> SetGuildAsActiveAsync(ulong guildId)
+        {
+            var guild = await _context.Guilds.SingleOrDefaultAsync(x => x.GuildId == guildId);
+            if (guild == null)
+            {
+                return null;
+            }
+            guild.IsActive = true;
+            await _context.SaveChangesAsync();
+            return guild;
+        }
+
+        public async Task<Guild?> SetGuildAsInactiveAsync(ulong guildId)
+        {
+            var guild = await _context.Guilds.SingleOrDefaultAsync(x => x.GuildId == guildId);
+            if (guild == null)
+            {
+                return null;
+            }
+            guild.IsActive = false;
             await _context.SaveChangesAsync();
             return guild;
         }

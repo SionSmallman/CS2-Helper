@@ -2,12 +2,10 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
-using System;
 using System.Reflection;
-using System.Threading.Tasks;
-
 namespace InteractionFramework;
 
+// Boilerplate Interaction Handler, adapted from: https://github.com/discord-net/Discord.Net/blob/dev/samples/InteractionFramework/InteractionHandler.cs
 public class InteractionHandler
 {
     private readonly DiscordSocketClient _client;
@@ -32,7 +30,6 @@ public class InteractionHandler
         // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService
         await _handler.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
 
-
         // Process the InteractionCreated payloads to execute Interactions commands
         _client.InteractionCreated += HandleInteraction;
 
@@ -46,12 +43,13 @@ public class InteractionHandler
         return Task.CompletedTask;
     }
 
+
     private async Task ReadyAsync()
     {
-        // Register the commands globally.
-        // alternatively you can use _handler.RegisterCommandsGloballyAsync() to register commands to a specific guild.
+
         //await _handler.RegisterCommandsGloballyAsync();
         await _handler.RegisterCommandsToGuildAsync(757751977617784873);
+        await _handler.RegisterCommandsToGuildAsync(1285484685081972736);
     }
 
     private async Task HandleInteraction(SocketInteraction interaction)
@@ -96,6 +94,7 @@ public class InteractionHandler
                 default:
                     break;
             }
+        Console.WriteLine($"{commandInfo.Name} by {context.User} at {context.Interaction.CreatedAt}");
 
         return Task.CompletedTask;
     }

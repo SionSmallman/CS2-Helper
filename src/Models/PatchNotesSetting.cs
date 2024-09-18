@@ -7,11 +7,11 @@ namespace Cs2Bot.Models;
 
 public partial class PatchNotesSetting
 {
-    public long GuildId { get; set; }
+    public ulong GuildId { get; set; }
 
     public bool PatchNotesEnabled { get; set; }
 
-    public long? ChannelId { get; set; }
+    public ulong? ChannelId { get; set; }
 
     public virtual Guild Guild { get; set; }
 }

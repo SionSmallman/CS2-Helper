@@ -8,7 +8,7 @@ namespace Cs2Bot.Models;
 
 public partial class BotDbContext : DbContext
 {
-    public BotDbContext(DbContextOptions<DbContext> options)
+    public BotDbContext(DbContextOptions<BotDbContext> options)
         : base(options)
     {
     }
@@ -16,6 +16,9 @@ public partial class BotDbContext : DbContext
     public virtual DbSet<Guild> Guilds { get; set; }
 
     public virtual DbSet<PatchNotesSetting> PatchNotesSettings { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        => optionsBuilder.UseMySql("Name=ConnectionStrings:Db", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.30-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

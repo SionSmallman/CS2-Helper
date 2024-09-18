@@ -1,5 +1,7 @@
-﻿using Cs2Bot.Data.Repositories;
+﻿using Coravel;
+using Cs2Bot.Data.Repositories;
 using Cs2Bot.Data.Repositories.Interfaces;
+using Cs2Bot.Invocables;
 using Cs2Bot.Models;
 using Cs2Bot.Services;
 using Cs2Bot.Services.Interfaces;
@@ -10,86 +12,75 @@ using InteractionFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http;
-using System.Reflection;
+using Microsoft.Extensions.Hosting;
+using System.Diagnostics;
 
-public class Program
+
+namespace Cs2Bot
 {
-    private static IServiceProvider _serviceProvider;
-    private DiscordSocketClient client;
-
-    static IServiceProvider CreateProvider()
+    public class Program
     {
-
-        IConfiguration config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build(); 
-
-        var discordConfig = new DiscordSocketConfig()
+        static async Task Main(string[] args)
         {
-            GatewayIntents = GatewayIntents.AllUnprivileged
-        };
-
-        var dbString = config["DbConnectionString"];
-
-        var collection = new ServiceCollection()
-            .AddSingleton(config)
-            .AddSingleton(discordConfig)
-            .AddSingleton<DiscordSocketClient>()
-            .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
-            .AddSingleton<InteractionHandler>()
-            .AddScoped<ISteamService, SteamService>()
-            .AddScoped<IGuildRepository, GuildRepository>()
-            .AddSingleton<OnJoin>()
-            .AddHttpClient()
-            .AddDbContext<BotDbContext>(options =>
+            var host = Host.CreateDefaultBuilder().ConfigureServices((hostContext, services) =>
             {
-                var connectionString = config["DbConnectionString"];
-                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+                IConfiguration config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+
+                var discordConfig = new DiscordSocketConfig()
+                {
+                    GatewayIntents = GatewayIntents.AllUnprivileged
+                };
+
+                services
+                    .AddSingleton(config)
+                    .AddSingleton(discordConfig)
+                    .AddSingleton<DiscordSocketClient>()
+                    .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
+                    .AddSingleton<InteractionHandler>()
+                    .AddScoped<ISteamService, SteamService>()
+                    .AddSingleton<IPatchNotesService, PatchNotesService>()
+                    .AddScoped<IGuildRepository, GuildRepository>()
+                    .AddScoped<IPatchNotesSettingRepository, PatchNotesSettingRepository>()
+                    .AddSingleton<OnJoinService>()
+                    .AddTransient<CheckForPatchInvocable>()
+                    .AddHttpClient()
+                    .AddDbContext<BotDbContext>(options =>
+                    {
+                        var connectionString = config["ConnectionStrings:Db"];
+                        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+                    })
+                    .AddScheduler();
+            }).Build();
+
+            var client= host.Services.GetRequiredService<DiscordSocketClient>();
+            await host.Services.GetRequiredService<InteractionHandler>()
+               .InitializeAsync();
+
+            // SERVICES THAT HOOK INTO EVENTS MUST BE INITIALISED HERE
+            // Initialise join services
+            var join = host.Services.GetRequiredService<OnJoinService>();
+
+            var _config = host.Services.GetRequiredService<IConfiguration>();
+
+            client.Log += LogAsync;
+
+            await client.LoginAsync(TokenType.Bot, _config["token"]);
+            await client.StartAsync();
+
+            // Schedule jobs
+            host.Services.UseScheduler(scheduler =>
+            {
+                scheduler.Schedule<CheckForPatchInvocable>().EveryMinute();
             });
 
+            await host.StartAsync();
+            await Task.Delay(Timeout.Infinite);
+        }
 
-
-        return collection.BuildServiceProvider();
-    }
-
-    static async Task Main(string[] args)
-    {
-        var _services = CreateProvider();
-
-        var client = _services.GetRequiredService<DiscordSocketClient>();
-        await _services.GetRequiredService<InteractionHandler>()
-           .InitializeAsync();
-
-
-        
-        var _config = _services.GetRequiredService<IConfiguration>();
-
-        client.Log += LogAsync;
-        client.JoinedGuild += JoinedGuild;
-
-        await client.LoginAsync(TokenType.Bot, _config["token"]);
-        await client.StartAsync();
-
-        await Task.Delay(Timeout.Infinite);
-
-    }
-    private static Task LogAsync(LogMessage message)
-    {
-        Console.WriteLine(message.ToString());
-        return Task.CompletedTask;
-    }
-
-    private static Task JoinedGuild(SocketGuild guild)
-    {
-        // Check DB to see if returning guild, if so, set IsActive to true;
-        // If new, add to DB
-        Console.WriteLine($"Joined {guild.Name}, GuildId: {guild.Id}");
-        var dbGuild = new Guild()
+        private static Task LogAsync(LogMessage message)
         {
-            GuildId = (long)guild.Id,
-            IsActive = true
-        };
-
-
-        return Task.CompletedTask;
+            Console.WriteLine(message.ToString());
+            return Task.CompletedTask;
+        }
     }
 }

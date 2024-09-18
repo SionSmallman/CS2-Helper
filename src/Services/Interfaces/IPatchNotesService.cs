@@ -4,7 +4,7 @@ namespace Cs2Bot.Services.Interfaces
 {
     public interface IPatchNotesService
     {
-        Task CheckForNewPatchNotesAsync();
+        Task<SteamNewsPost> CheckForNewPatchNotesAsync();
         Task SendPatchNotesToSubscribedGuilds(SteamNewsPost patchNotesPost);
     }
 }

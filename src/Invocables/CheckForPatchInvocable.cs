@@ -20,7 +20,11 @@ namespace Cs2Bot.Invocables
 
         public async Task Invoke()
         {
-            await _patchNotesService.CheckForNewPatchNotesAsync();
+            var post = await _patchNotesService.CheckForNewPatchNotesAsync();
+            if (post != null) 
+            {
+                await _patchNotesService.SendPatchNotesToSubscribedGuilds(post);
+            }
         }
     }
 }

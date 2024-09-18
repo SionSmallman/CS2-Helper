@@ -21,7 +21,7 @@ namespace Cs2Bot.Services
             _client = client;
         }
 
-        public async Task CheckForNewPatchNotesAsync()
+        public async Task<SteamNewsPost> CheckForNewPatchNotesAsync()
         {
             Console.WriteLine("Checking for new patch notes. Time Checked: " + DateTime.Now.ToString());
             Console.WriteLine(_lastUpdateTimestamp);
@@ -30,18 +30,23 @@ namespace Cs2Bot.Services
             var helper = new PatchNotesHelper();
             
             // Find first instance of patch notes (Steam API responds with latest newsposts first)
+            // If no patchnotes post found, return null
             var post = latestPosts.FirstOrDefault(x => x.Tags.Contains("patchnotes"));
+            if (post == null)
+            {
+                return null;
+            }
 
             // If post timestamp is smaller or equal to current latest, return early.
             if (post.Date <= _lastUpdateTimestamp)
             {
-                return;
+                return null;
             }
             _lastUpdateTimestamp = post.Date;
 
             Console.WriteLine($"New patch notes found! \n Title: {post.Title} \nDate: {DateTimeOffset.FromUnixTimeSeconds(_lastUpdateTimestamp).ToString()}");
 
-            await SendPatchNotesToSubscribedGuilds(post);
+            return post;
         }
 
         public async Task SendPatchNotesToSubscribedGuilds(SteamNewsPost patchNotesPost)

@@ -13,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Diagnostics;
 
 
 namespace Cs2Bot
@@ -22,6 +21,8 @@ namespace Cs2Bot
     {
         static async Task Main(string[] args)
         {
+            
+            // Build host
             var host = Host.CreateDefaultBuilder().ConfigureServices((hostContext, services) =>
             {
                 IConfiguration config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
@@ -30,7 +31,8 @@ namespace Cs2Bot
                 {
                     GatewayIntents = GatewayIntents.AllUnprivileged
                 };
-
+                
+                // Add services to container
                 services
                     .AddSingleton(config)
                     .AddSingleton(discordConfig)
@@ -52,18 +54,16 @@ namespace Cs2Bot
                     .AddScheduler();
             }).Build();
 
-            var client= host.Services.GetRequiredService<DiscordSocketClient>();
+            // Initialise client and interaction handler
+            var client = host.Services.GetRequiredService<DiscordSocketClient>();
             await host.Services.GetRequiredService<InteractionHandler>()
                .InitializeAsync();
 
             // SERVICES THAT HOOK INTO EVENTS MUST BE INITIALISED HERE
-            // Initialise join services
             var join = host.Services.GetRequiredService<OnJoinService>();
-
-            var _config = host.Services.GetRequiredService<IConfiguration>();
-
             client.Log += LogAsync;
 
+            var _config = host.Services.GetRequiredService<IConfiguration>();
             await client.LoginAsync(TokenType.Bot, _config["token"]);
             await client.StartAsync();
 

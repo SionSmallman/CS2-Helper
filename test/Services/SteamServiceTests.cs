@@ -4,13 +4,12 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.Protected;
 using System.Net;
-using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace Cs2BotTests.Services
 {
-    public class Tests
+    public class SteamServiceTests
     {
         private JsonObject sampleSteamNewsResponse;
         private Mock<IHttpClientFactory> httpClientFactoryMock;

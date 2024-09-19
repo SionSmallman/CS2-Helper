@@ -70,7 +70,7 @@ namespace Cs2Bot
             // Schedule jobs
             host.Services.UseScheduler(scheduler =>
             {
-                scheduler.Schedule<CheckForPatchInvocable>().EveryMinute();
+                scheduler.Schedule<CheckForPatchInvocable>().EveryFiveMinutes();
             });
 
             await host.StartAsync();

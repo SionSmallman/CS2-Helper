@@ -29,6 +29,7 @@ namespace CsBot_dotnet.src.Modules
             _patchSettingsRepository = patchSettingsRepository;
         }
 
+        [DefaultMemberPermissions(GuildPermission.ManageChannels)]
         [SlashCommand("patchnotes", "Get live CS2 patch notes when there's a game update")]
         public async Task SetPatchChannel([ChannelTypes(ChannelType.Text), Summary(description: "The channel you want patch notes posted to")] IChannel channel)
         {

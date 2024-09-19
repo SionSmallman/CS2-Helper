@@ -1,4 +1,4 @@
-# CS2 Helper - Discord
+# CS2 Helper - Discord bot
 
 CS2 Helper is a Discord bot with utilities that are helpful to Counter Strike 2 players.
 

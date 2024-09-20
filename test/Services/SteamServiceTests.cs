@@ -30,7 +30,6 @@ namespace Cs2BotTests.Services
         {
             //Arrange
             var sampleSteamNewsJsonString = File.ReadAllText("C:\\Users\\SionS\\Code Projects\\CSBOT\\test\\Services\\SampleApiResponses\\SampleSteamNewsResponse.json");
-            sampleSteamNewsResponse = JsonSerializer.Deserialize<JsonObject>(sampleSteamNewsJsonString);
 
             Mock<HttpMessageHandler> handlerMock = new Mock<HttpMessageHandler>();
             handlerMock
@@ -61,7 +60,6 @@ namespace Cs2BotTests.Services
         {
             //Arrange
             var sampleSteamNewsJsonString = File.ReadAllText("C:\\Users\\SionS\\Code Projects\\CSBOT\\test\\Services\\SampleApiResponses\\EmptySteamNewsResponse.json");
-            sampleSteamNewsResponse = JsonSerializer.Deserialize<JsonObject>(sampleSteamNewsJsonString);
 
             Mock<HttpMessageHandler> handlerMock = new Mock<HttpMessageHandler>();
             handlerMock
@@ -85,6 +83,39 @@ namespace Cs2BotTests.Services
             // Assert
             Assert.That(newsPosts, Is.TypeOf<List<SteamNewsPost>>());
             Assert.That(newsPosts.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task GetSteamUsersBanData_GetsMultipleSteamIds()
+        {
+            // Arrange
+            var sampleSteamBansJsonString = File.ReadAllText("C:\\Users\\SionS\\Code Projects\\CSBOT\\test\\Services\\SampleApiResponses\\SteamUserBanResponse.json");
+
+            Mock<HttpMessageHandler> handlerMock = new Mock<HttpMessageHandler>();
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(sampleSteamBansJsonString)
+                });
+            var httpClient = new HttpClient(handlerMock.Object);
+            httpClientFactoryMock.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
+            var steamIdsList = new List<long> { 76561198035701556, 76561198320351746, 76561198040904603 };
+
+
+            // Act
+            var steamBans = await steamService.GetSteamUsersBanData(steamIdsList);
+
+            // Assert
+            Assert.That(steamBans, Is.TypeOf<List<SteamUserBanData>>());
+            Assert.That(steamBans.Count, Is.EqualTo(3));
+
         }
     }
 }

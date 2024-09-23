@@ -11,7 +11,7 @@ CS2 Helper is a Discord bot with utilities that are helpful to Counter Strike 2 
 
 ## Stack
 
-The bot is built using **.NET Core** and **C#**, using the [Discord.NET](https://docs.discordnet.dev/index.html) library . **Nunit** and **Moq** are used for unit testing. Hosted on a VPS.
+The bot is built using **.NET** and **C#**, using the [Discord.NET](https://docs.discordnet.dev/index.html) library . **Nunit** is are used for unit testing. Hosted on a VPS.
 
 ## Motivation
 

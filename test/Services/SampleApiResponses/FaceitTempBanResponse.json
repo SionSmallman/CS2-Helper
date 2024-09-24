@@ -1,0 +1,15 @@
+{
+  "items": [
+    {
+      "nickname": "Skliaustas",
+      "type": "game",
+      "reason": "Playing on a smurf.",
+      "game": "cs2",
+      "starts_at": "2024-09-23T19:50:00Z",
+      "ends_at": "2024-10-23T19:50:00Z",
+      "user_id": "d7453fd9-c599-4ba6-bdb3-17f59c8814d5"
+    }
+  ],
+  "start": 0,
+  "end": 20
+}

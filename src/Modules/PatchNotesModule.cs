@@ -19,7 +19,6 @@ namespace CsBot_dotnet.src.Modules
 
         private InteractionHandler _handler;
         private ISteamService _steamService;
-        private IPatchNotesService _patchNoteService;
         private IPatchNotesSettingRepository _patchSettingsRepository;
 
         public PatchNotesModule(InteractionHandler handler, ISteamService steamService, IPatchNotesSettingRepository patchSettingsRepository)

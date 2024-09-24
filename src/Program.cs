@@ -1,4 +1,5 @@
 ﻿using Coravel;
+using Cs2Bot.Data;
 using Cs2Bot.Data.Repositories;
 using Cs2Bot.Data.Repositories.Interfaces;
 using Cs2Bot.Invocables;
@@ -31,7 +32,7 @@ namespace Cs2Bot
                 {
                     GatewayIntents = GatewayIntents.AllUnprivileged
                 };
-                
+
                 // Add services to container
                 services
                     .AddSingleton(config)
@@ -40,9 +41,12 @@ namespace Cs2Bot
                     .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
                     .AddSingleton<InteractionHandler>()
                     .AddScoped<ISteamService, SteamService>()
+                    .AddScoped<IFaceitService, FaceitService>()
                     .AddSingleton<IPatchNotesService, PatchNotesService>()
+                    .AddSingleton<ISuspectedCheaterService, SuspectedCheaterService>()
                     .AddScoped<IGuildRepository, GuildRepository>()
-                    .AddScoped<IPatchNotesSettingRepository, PatchNotesSettingRepository>()
+                    .AddScoped<IGuildPatchNotesSettingsRepository, GuildPatchNotesSettingsRepository>()
+                    .AddScoped<ISuspectedCheatersRepository, SuspectedCheatersRepository>()
                     .AddSingleton<OnJoinService>()
                     .AddTransient<CheckForPatchInvocable>()
                     .AddHttpClient()

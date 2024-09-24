@@ -19,9 +19,9 @@ namespace CsBot_dotnet.src.Modules
 
         private InteractionHandler _handler;
         private ISteamService _steamService;
-        private IPatchNotesSettingRepository _patchSettingsRepository;
+        private IGuildPatchNotesSettingsRepository _patchSettingsRepository;
 
-        public PatchNotesModule(InteractionHandler handler, ISteamService steamService, IPatchNotesSettingRepository patchSettingsRepository)
+        public PatchNotesModule(InteractionHandler handler, ISteamService steamService, IGuildPatchNotesSettingsRepository patchSettingsRepository)
         {
             _handler = handler;
             _steamService = steamService;
@@ -45,7 +45,7 @@ namespace CsBot_dotnet.src.Modules
                 
             } else
             {
-                var settings = new PatchNotesSetting()
+                var settings = new GuildPatchNotesSetting()
                 {
                     GuildId = chnl.Guild.Id,
                     PatchNotesEnabled = true,

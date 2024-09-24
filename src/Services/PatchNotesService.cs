@@ -10,11 +10,11 @@ namespace Cs2Bot.Services
     public class PatchNotesService : IPatchNotesService
     {
         private readonly ISteamService _steamService;
-        private readonly IPatchNotesSettingRepository _patchNotesSettingRepository;
+        private readonly IGuildPatchNotesSettingsRepository _patchNotesSettingRepository;
         private readonly DiscordSocketClient _client;
         private long _lastUpdateTimestamp = 0; 
 
-        public PatchNotesService(ISteamService steamService, IPatchNotesSettingRepository patchNotesSettingRepository, DiscordSocketClient client)
+        public PatchNotesService(ISteamService steamService, IGuildPatchNotesSettingsRepository patchNotesSettingRepository, DiscordSocketClient client)
         {
             _steamService = steamService;
             _patchNotesSettingRepository = patchNotesSettingRepository;

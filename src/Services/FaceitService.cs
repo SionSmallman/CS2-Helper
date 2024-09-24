@@ -1,4 +1,5 @@
 ﻿using Cs2Bot.Models;
+using Cs2Bot.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Cs2Bot.Services
 {
-    public class FaceitService
+    public class FaceitService : IFaceitService
     {
         private readonly IConfiguration _config;
         private readonly IHttpClientFactory _httpClientFactory;
@@ -34,13 +35,13 @@ namespace Cs2Bot.Services
                 response.EnsureSuccessStatusCode();
                 var banDataAsJsonString = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                 JsonObject banDataObject = JsonNode.Parse(banDataAsJsonString)!.AsObject();
-                
+
                 // If no bans found, return null
                 if (banDataObject["items"].AsArray().Count == 0)
                 {
                     return null;
                 }
-                
+
                 var jsonOptions = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true

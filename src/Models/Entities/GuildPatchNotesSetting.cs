@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Cs2Bot.Models;
+﻿namespace Cs2Bot.Models.Entities;
 
 public partial class GuildPatchNotesSetting
 {

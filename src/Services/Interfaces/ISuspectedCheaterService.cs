@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Cs2Bot.Models.Entities;
 
 namespace Cs2Bot.Services.Interfaces
 {
-    internal interface ISuspectedCheaterService
+    public interface ISuspectedCheaterService
     {
+        public Task<List<SuspectedCheater>> CheckForNewBansAsync();
+        public Task SendBanNotification(List<SuspectedCheater> newlyBannedCheaters);
     }
 }

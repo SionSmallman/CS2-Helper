@@ -26,8 +26,6 @@ namespace Cs2Bot.Services
             Console.WriteLine("Checking for new patch notes. Time Checked: " + DateTime.Now.ToString());
             Console.WriteLine(_lastUpdateTimestamp);
             List<SteamNewsPost> latestPosts  = await _steamService.GetLatestNewsPosts(3, 730);
-
-            var helper = new PatchNotesHelper();
             
             // Get patch note with largest timestamp
             // If no patchnotes post found, return null

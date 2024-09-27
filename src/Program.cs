@@ -49,6 +49,7 @@ namespace Cs2Bot
                     .AddScoped<ISuspectedCheatersRepository, SuspectedCheatersRepository>()
                     .AddSingleton<OnJoinService>()
                     .AddTransient<CheckForPatchInvocable>()
+                    .AddTransient<CheckForNewBansInvocable>()
                     .AddHttpClient()
                     .AddDbContext<BotDbContext>(options =>
                     {
@@ -75,6 +76,7 @@ namespace Cs2Bot
             host.Services.UseScheduler(scheduler =>
             {
                 scheduler.Schedule<CheckForPatchInvocable>().EveryFiveMinutes();
+                scheduler.Schedule<CheckForNewBansInvocable>().Hourly();
             });
 
             await host.StartAsync();

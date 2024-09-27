@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Cs2Bot.Models;
+﻿namespace Cs2Bot.Models.Entities;
 
 public partial class SuspectedCheater
 {
@@ -13,7 +10,7 @@ public partial class SuspectedCheater
 
     public ulong GuildId { get; set; }
 
-    public long DiscordUserId { get; set; }
+    public ulong DiscordUserId { get; set; }
 
     public ulong ChannelId { get; set; }
 

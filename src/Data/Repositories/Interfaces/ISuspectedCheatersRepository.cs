@@ -1,4 +1,4 @@
-﻿using Cs2Bot.Models;
+﻿using Cs2Bot.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Cs2Bot.Data.Repositories.Interfaces
 {
-    internal interface ISuspectedCheatersRepository
+    public interface ISuspectedCheatersRepository
     {
         Task<SuspectedCheater> CreateAsync(SuspectedCheater suspectedCheater);
         Task<List<SuspectedCheater>> GetAllAsync();

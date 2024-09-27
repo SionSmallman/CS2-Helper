@@ -1,5 +1,5 @@
 ﻿using Cs2Bot.Data.Repositories.Interfaces;
-using Cs2Bot.Models;
+using Cs2Bot.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cs2Bot.Data.Repositories

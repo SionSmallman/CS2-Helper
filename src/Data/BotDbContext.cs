@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Cs2Bot.Models;
+﻿using Cs2Bot.Models.Entities;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 
 namespace Cs2Bot.Data;
 

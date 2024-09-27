@@ -1,11 +1,6 @@
 ﻿using Cs2Bot.Data.Repositories.Interfaces;
-using Cs2Bot.Models;
+using Cs2Bot.Models.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cs2Bot.Data.Repositories
 {

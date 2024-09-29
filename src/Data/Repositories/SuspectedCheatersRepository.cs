@@ -41,6 +41,16 @@ namespace Cs2Bot.Data.Repositories
             return suspect;
         }
 
+        public async Task<SuspectedCheater?> CheckIfSuspectAlreadyTrackedAsync(string cheaterUserId, ulong guildId)
+        {
+            var suspect = await _context.SuspectedCheaters.SingleOrDefaultAsync(x => x.CheaterUserId == cheaterUserId && x.GuildId == guildId);
+            if (suspect == null)
+            {
+                return null;
+            }
+            return suspect;
+        }
+
         public async Task<SuspectedCheater?> SetBannedAsync(string cheaterUserId)
         {
             var cheater = await _context.SuspectedCheaters.SingleOrDefaultAsync(x => x.CheaterUserId == cheaterUserId);

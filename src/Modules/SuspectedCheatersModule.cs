@@ -31,8 +31,8 @@ namespace Cs2Bot.Modules
 
             var selectedPlatform = platformID.ToString();
 
-            string suspectUserId;
             // Get user ID from profile link
+            string suspectUserId;
             if (selectedPlatform == "Faceit")
             {
                 // Faceit profile Url is formatted: https://www.faceit.com/en/players/{nickname}
@@ -53,11 +53,18 @@ namespace Cs2Bot.Modules
                 }
             }
 
-            // If cheater already tracked in guild, return
-            var cheater = await _suspectedCheatersRepository.GetByCheaterUserIdAsync(suspectUserId);
-            if (cheater != null && cheater.GuildId == Context.Guild.Id) 
+            // If not a valid suspect ID, return
+            if (suspectUserId == null)
             {
-                await RespondAsync("Suspect is already being tracked!");
+                await RespondAsync("Could not find profile. Please check the profile link is correct and try again", ephemeral: true);
+                return;
+            }
+
+            // If cheater already tracked in guild, return
+            var existingSuspect = await _suspectedCheatersRepository.CheckIfSuspectAlreadyTrackedAsync(suspectUserId, Context.Guild.Id );
+            if (existingSuspect != null) 
+            {
+                await RespondAsync("Suspect is already being tracked in this guild!", ephemeral: true);
                 return;
             } 
 

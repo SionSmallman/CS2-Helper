@@ -13,6 +13,7 @@ namespace Cs2Bot.Data.Repositories.Interfaces
         Task<List<SuspectedCheater>> GetAllAsync();
         Task<List<SuspectedCheater>> GetAllUnbannedCheaters();
         Task<SuspectedCheater?> GetByCheaterUserIdAsync(string cheaterUserId);
+        Task<SuspectedCheater?> CheckIfSuspectAlreadyTrackedAsync(string cheaterUserId, ulong guildId);
         Task<SuspectedCheater?> SetBannedAsync(string cheaterUserId);
         Task<SuspectedCheater?> SetUnbannedAsync(string cheaterUserId);
     }

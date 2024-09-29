@@ -20,8 +20,6 @@ namespace Cs2Bot.Services
 
         public async Task<List<FaceitBanData>> GetFaceitUsersBanData(List<string> playerIds)
         {
-            if (playerIds.Count == 0) { return null; }
-
             List<FaceitBanData> bannedUsers = new List<FaceitBanData>();
 
             // For each supplied playerId, check Faceit API for ban data
@@ -62,7 +60,7 @@ namespace Cs2Bot.Services
 
         // Gets a Faceit users player ID
         // Faceit doesn't show player IDs publicly, need to call players endpoint to obtain
-        public async Task<string> GetFaceitIdFromNickname(string faceitNickname)
+        public async Task<string?> GetFaceitIdFromNickname(string faceitNickname)
         {
             var httpRequestMessage = new HttpRequestMessage(
                 HttpMethod.Get, $"https://open.faceit.com/data/v4/players?nickname={faceitNickname}");
@@ -71,10 +69,18 @@ namespace Cs2Bot.Services
             {
                 using HttpClient httpClient = _httpClientFactory.CreateClient();
                 var response = httpClient.SendAsync(httpRequestMessage).Result;
-                response.EnsureSuccessStatusCode();
-                var playerDataAsJsonString = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                JsonObject playerDataObject = JsonNode.Parse(playerDataAsJsonString)!.AsObject();
-                return playerDataObject["player_id"].ToString();
+                if (response.IsSuccessStatusCode) 
+                {
+                    var playerDataAsJsonString = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    JsonObject playerDataObject = JsonNode.Parse(playerDataAsJsonString)!.AsObject();
+                    return playerDataObject["player_id"].ToString();
+                }
+                else
+                {
+                    return null;
+                }
+                
+                
             }
             catch (Exception ex)
             {
@@ -82,7 +88,7 @@ namespace Cs2Bot.Services
             }
         }
 
-        public async Task<CheaterProfile> GetFaceitUserProfile(string playerId)
+        public async Task<CheaterProfile?> GetFaceitUserProfile(string playerId)
         {
             var httpRequestMessage = new HttpRequestMessage(
                 HttpMethod.Get, $"https://open.faceit.com/data/v4/players/{playerId}");
@@ -91,18 +97,25 @@ namespace Cs2Bot.Services
             {
                 using HttpClient httpClient = _httpClientFactory.CreateClient();
                 var response = httpClient.SendAsync(httpRequestMessage).Result;
-                response.EnsureSuccessStatusCode();
-                var faceitUserResponseAsJsonString = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                JsonObject faceitUserResponseObject = JsonNode.Parse(faceitUserResponseAsJsonString)!.AsObject();
-
-                var userProfile = new CheaterProfile()
+                if (response.IsSuccessStatusCode)
                 {
-                    Id = playerId,
-                    Nickname = faceitUserResponseObject["nickname"].ToString(),
-                    AvatarUrl = faceitUserResponseObject["avatar"].ToString(),
-                    ProfileUrl = $"https://faceit.com/en/players/{faceitUserResponseObject["nickname"].ToString()}"
-                };
-                return userProfile;
+                    var faceitUserResponseAsJsonString = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    JsonObject faceitUserResponseObject = JsonNode.Parse(faceitUserResponseAsJsonString)!.AsObject();
+
+                    var userProfile = new CheaterProfile()
+                    {
+                        Id = playerId,
+                        Nickname = faceitUserResponseObject["nickname"].ToString(),
+                        AvatarUrl = faceitUserResponseObject["avatar"].ToString(),
+                        ProfileUrl = $"https://faceit.com/en/players/{faceitUserResponseObject["nickname"].ToString()}"
+                    };
+                    return userProfile;
+                }
+                else
+                {
+                    return null;
+                }
+                
             }
             catch (Exception ex)
             {

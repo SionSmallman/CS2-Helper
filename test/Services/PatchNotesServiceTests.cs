@@ -113,7 +113,7 @@ namespace Cs2BotTests.Services
         }
 
         [Test]
-        public async Task CheckForNewPatchNotesAsync_ReturnsNewestPatchNotes()
+        public async Task CheckForNewPatchNotesAsync_ReturnsOnlyNewestPatchNotes()
         {
             // Arrange
             var correctPatchNotesNewsPost = new SteamNewsPost()

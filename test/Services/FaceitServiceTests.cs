@@ -1,6 +1,7 @@
 ﻿using Cs2Bot.Models;
 using Cs2Bot.Services;
 using Cs2Bot.Services.Interfaces;
+using Cs2BotTests.TestHelpers;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.Protected;
@@ -16,6 +17,7 @@ namespace Cs2BotTests.Services
         private Mock<IHttpClientFactory> httpClientFactoryMock;
         private Mock<IConfiguration> configMock;
         private FaceitService faceitService;
+        private ThirdPartyApiMocker apiMocker;
 
         [SetUp]
         public void Setup()
@@ -23,6 +25,7 @@ namespace Cs2BotTests.Services
             configMock = new Mock<IConfiguration>();
             httpClientFactoryMock = new Mock<IHttpClientFactory>();
             faceitService = new FaceitService(configMock.Object, httpClientFactoryMock.Object);
+            apiMocker = new ThirdPartyApiMocker();
         }
 
         [Test]
@@ -30,21 +33,8 @@ namespace Cs2BotTests.Services
         {
             // Arrange
             var sampleFaceitPlayerDetailsJsonString = File.ReadAllText("C:\\Users\\SionS\\Code Projects\\CSBOT\\test\\Services\\SampleApiResponses\\FaceitPlayerDetailsResponse.json");
-
-            Mock<HttpMessageHandler> handlerMock = new Mock<HttpMessageHandler>();
-            handlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>()
-                )
-                .ReturnsAsync(new HttpResponseMessage()
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(sampleFaceitPlayerDetailsJsonString)
-                });
-            var httpClient = new HttpClient(handlerMock.Object);
+            
+            var httpClient = apiMocker.CreateClientForMock(HttpStatusCode.OK, sampleFaceitPlayerDetailsJsonString);
             httpClientFactoryMock.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
             // Act
@@ -59,100 +49,77 @@ namespace Cs2BotTests.Services
         // Temporary ban and permanent ban responses return different json from Faceit API
         // So test for both scenarios to make sure all ban types are caught
         [Test]
-        public async Task GetFaceitBanData_ReturnsTempBans()
+        public async Task GetFaceitUsersBanData_ReturnsTempBans()
         {
             // Arrange
             var faceitBanJsonString = File.ReadAllText("C:\\Users\\SionS\\Code Projects\\CSBOT\\test\\Services\\SampleApiResponses\\FaceitTempBanResponse.json");
 
-            Mock<HttpMessageHandler> handlerMock = new Mock<HttpMessageHandler>();
-            handlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>()
-                )
-                .ReturnsAsync(new HttpResponseMessage()
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(faceitBanJsonString)
-                });
-            var httpClient = new HttpClient(handlerMock.Object);
+            var httpClient = apiMocker.CreateClientForMock(HttpStatusCode.OK, faceitBanJsonString);
             httpClientFactoryMock.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-            var userId = "d7453fd9-c599-4ba6-bdb3-17f59c8814d5";
+            var userIds = new List<string>() { "d7453fd9-c599-4ba6-bdb3-17f59c8814d5" };
 
             // Act
-            List<FaceitBanData> banData = await faceitService.GetFaceitUserBanData(userId);
+            List<FaceitBanData> banData = await faceitService.GetFaceitUsersBanData(userIds);
 
             // Assert
             Assert.That(banData, Is.Not.Null);
             Assert.That(banData, Is.TypeOf<List<FaceitBanData>>());
-            Assert.That(banData[0].User_Id, Is.EqualTo(userId));
+            Assert.That(banData[0].User_Id, Is.EqualTo(userIds[0]));
         }
 
         [Test]
-        public async Task GetFaceitBanData_ReturnsPermaBans()
+        public async Task GetFaceitUsersBanData_ReturnsPermaBans()
         {
             // Arrange
             var faceitBanJsonString = File.ReadAllText("C:\\Users\\SionS\\Code Projects\\CSBOT\\test\\Services\\SampleApiResponses\\FaceitPermaBanResponse.json");
 
-            Mock<HttpMessageHandler> handlerMock = new Mock<HttpMessageHandler>();
-            handlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>()
-                )
-                .ReturnsAsync(new HttpResponseMessage()
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(faceitBanJsonString)
-                });
-            var httpClient = new HttpClient(handlerMock.Object);
+            var httpClient = apiMocker.CreateClientForMock(HttpStatusCode.OK, faceitBanJsonString);
             httpClientFactoryMock.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-            var userId = "b683bcaa-5070-41ee-9181-7ee34ae8c162";
+            var userIds = new List<string>() { "b683bcaa-5070-41ee-9181-7ee34ae8c162" };
 
             // Act
-            List<FaceitBanData> banData = await faceitService.GetFaceitUserBanData(userId);
+            List<FaceitBanData> banData = await faceitService.GetFaceitUsersBanData(userIds);
 
             // Assert
             Assert.That(banData, Is.Not.Null);
+            Assert.That(banData.Count, Is.EqualTo(userIds.Count));
             Assert.That(banData, Is.TypeOf<List<FaceitBanData>>());
-            Assert.That(banData[0].User_Id, Is.EqualTo(userId));
+            Assert.That(banData[0].User_Id, Is.EqualTo(userIds[0]));
         }
 
         [Test]
-        public async Task GetFaceitBanData_ReturnsNullIfNoBansFound()
+        public async Task GetFaceitUsersBanData_ReturnsEmptyIfNoBansFound()
         {
             // Arrange
             var faceitBanJsonString = File.ReadAllText("C:\\Users\\SionS\\Code Projects\\CSBOT\\test\\Services\\SampleApiResponses\\FaceitEmptyBanResponse.json");
 
-            Mock<HttpMessageHandler> handlerMock = new Mock<HttpMessageHandler>();
-            handlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>()
-                )
-                .ReturnsAsync(new HttpResponseMessage()
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(faceitBanJsonString)
-                });
-            var httpClient = new HttpClient(handlerMock.Object);
+            var httpClient = apiMocker.CreateClientForMock(HttpStatusCode.OK, faceitBanJsonString);
             httpClientFactoryMock.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-            var userId = "b683bcaa-5070-41ee-9181-7ee34ae8c162";
-
-            // Act
-            List<FaceitBanData> banData = await faceitService.GetFaceitUserBanData(userId);
+            var userIds = new List<string>() { "b683bcaa-5070-41ee-9181-7ee34ae8c162" };
+                // Act
+                List <FaceitBanData> banData = await faceitService.GetFaceitUsersBanData(userIds);
 
             // Assert
-            Assert.That(banData, Is.Null);
+            Assert.That(banData, Is.Empty);
+        }
+
+        // Only called when ID has been confirmed, so no need to test scenarios where ID doesn't match a profile
+        [Test]
+        public async Task GetFaceitUserProfile_GetsFaceitProfile()
+        {
+            var sampleFaceitUserProfileJson = File.ReadAllText("C:\\Users\\SionS\\Code Projects\\CSBOT\\test\\Services\\SampleApiResponses\\FaceitUserProfileResponse.json");
+
+            var httpClient = apiMocker.CreateClientForMock(HttpStatusCode.OK, sampleFaceitUserProfileJson);
+            httpClientFactoryMock.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
+
+            // Act
+            CheaterProfile profile = await faceitService.GetFaceitUserProfile(It.IsAny<string>());
+
+            // Assert
+            Assert.That(profile, Is.TypeOf<CheaterProfile>());
         }
     }
 }

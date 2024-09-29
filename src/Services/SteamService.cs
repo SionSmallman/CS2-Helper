@@ -92,7 +92,7 @@ namespace Cs2Bot.Services
         }
 
         // Gets a Steam users profile details
-        public async Task<CheaterProfile> GetSteamUserProfile(string playerId)
+        public async Task<CheaterProfile?> GetSteamUserProfile(string playerId)
         {
             var httpRequestMessage = new HttpRequestMessage(
                 HttpMethod.Get, $"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={_config["SteamApiKey"]}&steamids={playerId}");
@@ -100,19 +100,26 @@ namespace Cs2Bot.Services
             {
                 using HttpClient httpClient = _httpClientFactory.CreateClient();
                 var response = httpClient.SendAsync(httpRequestMessage).Result;
-                response.EnsureSuccessStatusCode();
-                var steamUserResponseAsJsonString = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                JsonObject steamUserResponseObject = JsonNode.Parse(steamUserResponseAsJsonString)!.AsObject();
-                var userNode = steamUserResponseObject["response"]["players"]![0];
-
-                var userProfile = new CheaterProfile()
+                if (response.IsSuccessStatusCode)
                 {
-                    Id = playerId,
-                    Nickname = userNode["personaname"].ToString(),
-                    AvatarUrl = userNode["avatarmedium"].ToString(),
-                    ProfileUrl = userNode["profileurl"].ToString()
-                };
-                return userProfile;
+                    var steamUserResponseAsJsonString = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    JsonObject steamUserResponseObject = JsonNode.Parse(steamUserResponseAsJsonString)!.AsObject();
+                    var userNode = steamUserResponseObject["response"]["players"]![0];
+
+                    var userProfile = new CheaterProfile()
+                    {
+                        Id = playerId,
+                        Nickname = userNode["personaname"].ToString(),
+                        AvatarUrl = userNode["avatarmedium"].ToString(),
+                        ProfileUrl = userNode["profileurl"].ToString()
+                    };
+                    return userProfile;
+                }
+                else
+                {
+                    return null;
+                }
+                
             }
             catch (Exception ex)
             {
@@ -131,8 +138,13 @@ namespace Cs2Bot.Services
                 var response = httpClient.SendAsync(httpRequestMessage).Result;
                 response.EnsureSuccessStatusCode();
                 var steamResponseAsJsonString = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                Console.WriteLine(steamResponseAsJsonString);
                 JsonObject steamResponseObject = JsonNode.Parse(steamResponseAsJsonString)!.AsObject();
+                
+                // If response contains a message node, there's no match so return null
+                if (steamResponseObject["response"]["message"] != null) 
+                { 
+                    return null; 
+                }
                 return steamResponseObject["response"]["steamid"].ToString();
             }
             catch (Exception ex)

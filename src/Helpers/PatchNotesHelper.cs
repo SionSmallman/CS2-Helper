@@ -1,10 +1,4 @@
-﻿using Cs2Bot.Models;
-using Microsoft.Extensions.FileProviders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace Cs2Bot.Helpers
 {

@@ -1,28 +1,22 @@
 ﻿using Cs2Bot.Data.Repositories.Interfaces;
 using Cs2Bot.Models;
+using Cs2Bot.Models.Entities;
 using Cs2Bot.Services.Interfaces;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using InteractionFramework;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CsBot_dotnet.src.Modules
+namespace Cs2Bot.Modules
 {
     public class PatchNotesModule : InteractionModuleBase<SocketInteractionContext>
     {
 
         private InteractionHandler _handler;
         private ISteamService _steamService;
-        private IPatchNotesService _patchNoteService;
-        private IPatchNotesSettingRepository _patchSettingsRepository;
+        private IGuildPatchNotesSettingsRepository _patchSettingsRepository;
 
-        public PatchNotesModule(InteractionHandler handler, ISteamService steamService, IPatchNotesSettingRepository patchSettingsRepository)
+        public PatchNotesModule(InteractionHandler handler, ISteamService steamService, IGuildPatchNotesSettingsRepository patchSettingsRepository)
         {
             _handler = handler;
             _steamService = steamService;
@@ -39,14 +33,15 @@ namespace CsBot_dotnet.src.Modules
             // Check if channel has already subscribed before
             // If so, update chosen channel ID
             var patchNoteRecord = await _patchSettingsRepository.GetByGuildIdAsync(chnl.Guild.Id);
-            if (patchNoteRecord != null) 
+            if (patchNoteRecord != null)
             {
                 await _patchSettingsRepository.UpdateChannelAsync(chnl.Guild.Id, channel.Id);
                 await _patchSettingsRepository.SetActiveAsync(chnl.Guild.Id);
-                
-            } else
+
+            }
+            else
             {
-                var settings = new PatchNotesSetting()
+                var settings = new GuildPatchNotesSetting()
                 {
                     GuildId = chnl.Guild.Id,
                     PatchNotesEnabled = true,

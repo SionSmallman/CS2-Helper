@@ -1,13 +1,6 @@
 ﻿using Cs2Bot.Data.Repositories.Interfaces;
-using Cs2Bot.Models;
-using Discord.Interactions;
+using Cs2Bot.Models.Entities;
 using Discord.WebSocket;
-using InteractionFramework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cs2Bot.Services
 {

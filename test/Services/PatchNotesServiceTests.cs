@@ -12,7 +12,7 @@ namespace Cs2BotTests.Services
     {
         private JsonObject sampleSteamNewsResponse;
         private Mock<ISteamService> steamServiceMock;
-        private Mock<IPatchNotesSettingRepository> patchNotesSettingRepositoryMock;
+        private Mock<IGuildPatchNotesSettingsRepository> patchNotesSettingRepositoryMock;
         private Mock<DiscordSocketClient> discordSocketClientMock;
         private PatchNotesService patchNotesService;
 
@@ -20,7 +20,7 @@ namespace Cs2BotTests.Services
         public void Setup()
         {
             steamServiceMock = new Mock<ISteamService>();
-            patchNotesSettingRepositoryMock = new Mock<IPatchNotesSettingRepository>();
+            patchNotesSettingRepositoryMock = new Mock<IGuildPatchNotesSettingsRepository>();
             discordSocketClientMock = new Mock<DiscordSocketClient>();
             patchNotesService = new PatchNotesService(steamServiceMock.Object, patchNotesSettingRepositoryMock.Object, discordSocketClientMock.Object);
         }
@@ -113,7 +113,7 @@ namespace Cs2BotTests.Services
         }
 
         [Test]
-        public async Task CheckForNewPatchNotesAsync_ReturnsNewestPatchNotes()
+        public async Task CheckForNewPatchNotesAsync_ReturnsOnlyNewestPatchNotes()
         {
             // Arrange
             var correctPatchNotesNewsPost = new SteamNewsPost()

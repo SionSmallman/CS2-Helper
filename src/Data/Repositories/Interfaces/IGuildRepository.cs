@@ -1,4 +1,4 @@
-﻿using Cs2Bot.Models;
+﻿using Cs2Bot.Models.Entities;
 
 namespace Cs2Bot.Data.Repositories.Interfaces
 {

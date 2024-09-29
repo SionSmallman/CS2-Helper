@@ -28,7 +28,7 @@ namespace Cs2Bot.Modules
             [Summary(description: "The link to the suspects profile (e.g Steam profile link/Faceit profile link")] string profileLink
             )
         {
-
+            var profileUri = new Uri( profileLink );
             var selectedPlatform = platformID.ToString();
 
             // Get user ID from profile link
@@ -36,12 +36,14 @@ namespace Cs2Bot.Modules
             if (selectedPlatform == "Faceit")
             {
                 // Faceit profile Url is formatted: https://www.faceit.com/en/players/{nickname}
-                var faceitNickname = profileLink.Substring(profileLink.LastIndexOf('/') + 1);
+                var faceitNickname = profileUri.Segments.Last();
                 suspectUserId = await _faceitService.GetFaceitIdFromNickname(faceitNickname);
             }
             else
             {
-                var steamUrlId = profileLink.Substring(profileLink.LastIndexOf('/') + 1);
+                // Steam profile url is formatted: https://steamcommunity.com/profiles/{id or vanity url}/
+                var steamUrlId = profileUri.Segments.Last().TrimEnd('/');
+                
                 // If the Url has letters, then they've used a custom vanity url instead of the SteamID64.
                 // So resolve to SteamID64
                 if (steamUrlId.Any(char.IsLetter)) {
@@ -81,7 +83,6 @@ namespace Cs2Bot.Modules
             await RespondAsync($"Now tracking: {profileLink}");
         }
         
-
     public enum PlatformIDs
         {
             Steam,

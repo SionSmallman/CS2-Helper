@@ -79,6 +79,7 @@ namespace Cs2Bot.Services
                     continue;
                 }
 
+                // Grab the profile details for the embed
                 CheaterProfile profile;
                 if (cheater.Platform == "Faceit")
                 {

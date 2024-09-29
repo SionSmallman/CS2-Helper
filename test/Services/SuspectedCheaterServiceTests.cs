@@ -45,8 +45,7 @@ namespace Cs2BotTests.Services
         [Test]
         public async Task CheckForNewBansAsync_ReturnsEmptyIfNoNewBans()
         {
-            // START HEREE
-            
+            // Arrange
             var testSuspect = new SuspectedCheater()
             {
                 CheaterUserId = "test",
@@ -56,8 +55,7 @@ namespace Cs2BotTests.Services
                 DiscordUserId = 2903845,
                 ChannelId = 039845,
             };
-            
-            // Arrange
+
             suspectRepositoryMock.Setup(x => x.GetAllUnbannedCheaters()).ReturnsAsync(new List<SuspectedCheater>() { testSuspect });
             steamServiceMock.Setup(x => x.GetSteamUsersBanData(It.IsAny<List<string>>())).ReturnsAsync(new List<SteamUserBanData>());
             faceitServiceMock.Setup(x => x.GetFaceitUsersBanData(It.IsAny<List<string>>())).ReturnsAsync(new List<FaceitBanData>());
